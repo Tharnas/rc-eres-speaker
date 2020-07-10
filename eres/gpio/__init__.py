@@ -7,7 +7,6 @@ from ..events.GpioEvent import GpioEvent
 
 class Gpio:
     def __init__(self, comm):
-
         super().__init__()
         self._comm = comm
 
@@ -44,6 +43,5 @@ class Gpio:
         return True
 
     def handleState(self, state):
-
         pass
 

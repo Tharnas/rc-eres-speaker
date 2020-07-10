@@ -96,10 +96,3 @@ class Announcement:
         if self._isPlayed:
             self._sound.stop()
             self._isPlayed = False
-
-# class SoundAnnouncements(IntEnum):
-#     START = 0
-#     EIGHT_MIN_LEFT= 1
-#     SEVEN_MIN_LEFT = 2
-#     SIX_AND_A_HALF_MIN_LEFT = 3
-#     SIX_MIN_LEFT = 4
