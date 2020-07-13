@@ -18,17 +18,11 @@ class Countdown:
 
         logging.debug("Initializing countdown...")
 
-        self.TIMERINTERVAL = 2
-        self._timeLeft = 0
+        self.TIMERINTERVAL = 0.1 # seconds
+        self._timeLeft = 0 
         self._timer = None
 
         logging.debug("Countdown initialized!")
-
-    def timerCallback(self):
-        self._timeLeft -= self.TIMERINTERVAL
-        self._comm.broadcast(CountdownEvent(self._timeLeft / 10))
-        self._timer = threading.Timer(self.TIMERINTERVAL / 10, self.timerCallback)
-        self._timer.start()
 
     def run(self):
         logging.debug("Countdown: RUN!!")
@@ -40,15 +34,25 @@ class Countdown:
 
         return True
 
+    def timerCallback(self):
+        self._timeLeft -= self.TIMERINTERVAL
+        self._comm.broadcast(CountdownEvent(self._timeLeft))
+        self.runTimer()
+
+    def runTimer(self):
+        self._timer = threading.Timer(self.TIMERINTERVAL, self.timerCallback)
+        self._timer.start()
+
+    def stopTimer(self):
+        if self._timer is not None:
+            self._timer.cancel()
+            
     def handleState(self, state):
         if isinstance(state, CountdownState):
             # start timer
-            if self._timer is not None:
-                self._timer.cancel()
-            self._timeLeft = (540 + 6) * 10  # 9 min + 5s
-            self._timer = threading.Timer(self.TIMERINTERVAL / 2, self.timerCallback)
-            self._timer.start()
+            self.stopTimer() # make sure timer is not running
+            self._timeLeft = 540 + 6  # 9 min + 5s
+            self.runTimer()
         elif isinstance(state, State):
             # stop timer
-            if self._timer is not None:
-                self._timer.cancel()
+            self.stopTimer()
