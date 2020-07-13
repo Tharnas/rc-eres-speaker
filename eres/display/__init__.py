@@ -41,19 +41,28 @@ class Display:
         # start drawing timer        
         self.runDrawTimer()
 
+        self._statusPixelToggleCounter = time.perf_counter()
+
         logging.debug("Display initialized!")
 
     def runDrawTimer(self):
-        self._timer = threading.Timer(0.05, self.timerCallback)
-        self._timer.start()
+        self._drawTimer = threading.Timer(0.1, self.timerCallback)
+        self._drawTimer.start()
 
     def timerCallback(self):
+
+        # toggle status pixel if redraw is required or not later than 1.5s
+        currentCounter = time.perf_counter()
+        sinceLastToggle = currentCounter - self._statusPixelToggleCounter
+        if self._displayInformation.shouldRedraw or sinceLastToggle >= 1.5:
+            self._displayInformation.statusPixel = not self._displayInformation.statusPixel
+            self._statusPixelToggleCounter = currentCounter
+
         if self._displayInformation.shouldRedraw:
             self.draw()
             self._displayInformation.markDrawn()
-        
-        self._timer = threading.Timer(1, self.timerCallback)
-        self._timer.start()
+
+        self.runDrawTimer()
 
 
     def run(self):
@@ -67,7 +76,8 @@ class Display:
         return True
 
     def draw(self):
-        startTime= time.perf_counter()
+        # startTime= time.perf_counter()
+
         # Box and text rendered in portrait mode
         with canvas(self._device) as draw:
             # stop button
@@ -88,8 +98,9 @@ class Display:
             # status pixel
             if self._displayInformation.statusPixel:
                 draw.rectangle((0,0,1,1), fill="white")
-        endTime = time.perf_counter()
-        logging.debug("took {} to draw".format(endTime - startTime))
+
+        # endTime = time.perf_counter()
+        # logging.debug("took {} to draw".format(endTime - startTime))
 
     def drawCountdown(self, text, draw, font):
         w, h = draw.textsize(text, font=font)
@@ -141,10 +152,6 @@ class Display:
             else:
                 self._displayInformation.timeLeft = time.strftime("-%M:%S", time.gmtime(state.timeLeft*(-1)))
 
-            if (state.timeLeft % 10) == 0:
-                logging.debug("Countdown: {}".format(state.timeLeft))
-            # logging.debug("Countdown: {}".format(self._displayInformation.timeLeft))
-
 
 class DisplayInformation:
     def __init__(self):
@@ -163,7 +170,7 @@ class DisplayInformation:
 
     @statusText.setter
     def statusText(self, value):
-        if value is not self._statusText:
+        if value != self._statusText:
             self._statusText = value
             self._shouldRedraw = True
 
@@ -173,7 +180,7 @@ class DisplayInformation:
 
     @statusPixel.setter
     def statusPixel(self, value):
-        if value is not self._statusPixel:
+        if value != self._statusPixel:
             self._statusPixel = value
             self._shouldRedraw = True
 
@@ -183,7 +190,7 @@ class DisplayInformation:
 
     @timeLeft.setter
     def timeLeft(self, value):
-        if value is not self._timeLeft:
+        if value != self._timeLeft:
             self._timeLeft = value
             self._shouldRedraw = True
             
@@ -193,7 +200,7 @@ class DisplayInformation:
 
     @showStartButton.setter
     def showStartButton(self, value):
-        if value is not self._showStartButton:
+        if value != self._showStartButton:
             self._showStartButton = value
             self._shouldRedraw = True
 
@@ -203,7 +210,7 @@ class DisplayInformation:
 
     @showStopButton.setter
     def showStopButton(self, value):
-        if value is not self._showStopButton:
+        if value != self._showStopButton:
             self._showStopButton = value
             self._shouldRedraw = True
 
