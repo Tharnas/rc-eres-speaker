@@ -1,4 +1,5 @@
 import logging
+import time
 
 import threading
 
@@ -18,8 +19,9 @@ class Countdown:
 
         logging.debug("Initializing countdown...")
 
-        self.TIMERINTERVAL = 0.1 # seconds
-        self._timeLeft = 0 
+        self.TIMERINTERVAL = 0.2 # 0,2 second
+        self._totalTime = 540 + 6 # 9 min + 5s
+        self._startedAt = 0
         self._timer = None
 
         logging.debug("Countdown initialized!")
@@ -35,8 +37,9 @@ class Countdown:
         return True
 
     def timerCallback(self):
-        self._timeLeft -= self.TIMERINTERVAL
-        self._comm.broadcast(CountdownEvent(self._timeLeft))
+        currentTime = time.perf_counter()
+        timeLeft = self._totalTime - (currentTime - self._startedAt)
+        self._comm.broadcast(CountdownEvent(timeLeft))
         self.runTimer()
 
     def runTimer(self):
@@ -51,7 +54,7 @@ class Countdown:
         if isinstance(state, CountdownState):
             # start timer
             self.stopTimer() # make sure timer is not running
-            self._timeLeft = 540 + 6  # 9 min + 5s
+            self._startedAt = time.perf_counter()
             self.runTimer()
         elif isinstance(state, State):
             # stop timer
