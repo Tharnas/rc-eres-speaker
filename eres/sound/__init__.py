@@ -17,7 +17,7 @@ class Sound:
         self._comm = comm
         self._state = stateMachine.state
 
-        pygame.mixer.init()
+        pygame.init()
 
         soundRootLocation = os.path.dirname(os.path.abspath(__file__))
         self._announcements = [
