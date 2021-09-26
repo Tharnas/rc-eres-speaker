@@ -19,7 +19,7 @@ class Countdown:
 
         logging.debug("Initializing countdown...")
 
-        self.TIMERINTERVAL = 0.2 # 0,2 second
+        self.TIMERINTERVAL = 0.01 # in seconds
         self._totalTime = 540 + 6 # 9 min + 5s
         self._startedAt = 0
         self._timer = None

@@ -17,7 +17,7 @@ class Sound:
         self._comm = comm
         self._state = stateMachine.state
 
-        pygame.init()
+        pygame.mixer.init()
 
         soundRootLocation = os.path.dirname(os.path.abspath(__file__))
         self._announcements = [
@@ -62,6 +62,7 @@ class Sound:
     def handleCountdownEvent(self, state):
         for announcement in self._announcements:
             if announcement.IsPlayed == False and announcement.ShouldTriggerAt > state.timeLeft:
+                logging.debug("Sound: play sound (ShouldTriggerAt: " + str(announcement.ShouldTriggerAt) + ", timeLeft: " + str(state.timeLeft) + ")")
                 announcement.Play()
                 break # shold only play once per event
 
@@ -76,7 +77,9 @@ class Announcement:
     def __init__(self, filename, shouldPlayAt):
         self._sound = pygame.mixer.Sound(filename)
         self._isPlayed = False
-        self._shouldTriggerAt = shouldPlayAt + self._sound.get_length()
+        # "jetzt" starts normally 400ms before the end of the file. Therefore time it to the middle of "jetzt".
+        self._shouldTriggerAt = shouldPlayAt + self._sound.get_length() - 0.2
+        logging.debug("Sound: " +filename+ " (ShouldTriggerAt: " + str(self._shouldTriggerAt) + ", soundLength: " + str(self._sound.get_length()) + ")")
 
 
     @property
