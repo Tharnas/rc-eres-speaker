@@ -80,24 +80,28 @@ class Display:
 
         # Box and text rendered in portrait mode
         with canvas(self._device) as draw:
-            # stop button
-            if self._displayInformation.showStopButton:
-                self.drawStop(draw, self._regularFont)
+            try:
+                # stop button
+                if self._displayInformation.showStopButton:
+                    self.drawStop(draw, self._regularFont)
 
-            # start button
-            if self._displayInformation.showStartButton:
-               self.drawStart(draw, self._regularFont)
+                # start button
+                if self._displayInformation.showStartButton:
+                    self.drawStart(draw, self._regularFont)
 
-            # time left
-            if self._displayInformation.timeLeft:
-                self.drawCountdown(self._displayInformation.timeLeft, draw, self._bigFont)
-            
-            # status text
-            self.drawTitle(self._displayInformation.statusText, draw, self._smallFont)
+                # time left
+                if self._displayInformation.timeLeft:
+                    self.drawCountdown(self._displayInformation.timeLeft, draw, self._bigFont)
+                
+                # status text
+                self.drawTitle(self._displayInformation.statusText, draw, self._smallFont)
 
-            # status pixel
-            if self._displayInformation.statusPixel:
-                draw.rectangle((0,0,1,1), fill="white")
+                # status pixel
+                if self._displayInformation.statusPixel:
+                    draw.rectangle((0,0,1,1), fill="white")
+            except:
+                logging.exception("Display: error during drawing.")
+
 
         # endTime = time.perf_counter()
         # logging.debug("took {} to draw".format(endTime - startTime))
